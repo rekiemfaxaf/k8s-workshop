@@ -84,8 +84,8 @@ kubectl edit pod nodejs-example
 
 ## Variables de entorno
 
-Las sección ```env``` del **spec** se utiliza para definir variables las pueden ser definidas
-en el mismo ```yaml``` o referenciando ```ConfigMaps```,```Secrets``` u otros
+Las sección `env` del **spec** se utiliza para definir variables las pueden ser definidas
+en el mismo `yaml` o referenciando `ConfigMaps`,`Secrets` u otros
 [campos](https://kubernetes.io/docs/tasks/inject-data-application/environment-variable-expose-pod-information/) del yaml.
 
 ```yaml

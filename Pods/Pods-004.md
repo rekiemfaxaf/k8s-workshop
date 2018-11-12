@@ -26,19 +26,80 @@ kubectl get nodes --show-labels
 Durante la creación del **spec** de un Pod se debe agregar la etiqueta con que deseamos se elija el nodo.
 
 ```yaml
-apiVersion: v1
-kind: Pod
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: nginx
+  name: nodejs-example-affi
+  namespace: default
 spec:
-  containers:
-    - name: app
-      image: nginx:latest
-      ports:
-        - containerPort: 80
-          protocol: TCP
-  nodeSelector:
-    tier: 'dev'
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 1
+  revisionHistoryLimit: 4
+  replicas: 4
+  minReadySeconds: 20
+  selector:
+    matchLabels:
+      app: nodejs-affi
+  template:
+    metadata:
+      labels:
+        app: nodejs-affi
+        role: example
+        version: v1
+    spec:
+      nodeSelector:
+        tier: dev
+      volumes:
+        - name: shared-lock
+          emptyDir: {}
+      initContainers:
+        - name: createlock
+          image: busybox
+          command: ["sh", "-c", "touch /shared/key.lock && echo Lock creado"]
+          volumeMounts:
+            - mountPath: /shared
+              name: shared-lock
+      containers:
+        - name: app
+          image: semoac/nodejs-example:latest
+          command: ["bash", "/app/checklock.sh"]
+          volumeMounts:
+            - mountPath: /shared
+              name: shared-lock
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+              protocol: TCP
+          env:
+            - name: PORT
+              value: "3000"
+            - name: NS
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: HEALTH_STATUS
+              value: "200"
+          livenessProbe:
+            tcpSocket:
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 3
+```
+
+Podemos comprobar la selección ejecutando
+
+```
+kubectl get pods -o wide
+kubectl get nodes -l tier=dev
 ```
 
 ## Affinity
@@ -72,7 +133,7 @@ Finalmente, los operadores para definir los requrimientos son los siguientes:
 
 Esta afinidad se utiliza para elegir nodos.
 
-Por ejemplo: *Lanzar el pod en un nodo que no tengas las API de Kubernetes y que posea cualquier label del tipo "tier".*
+Por ejemplo: *Lanzar la aplicación redis en los mismo nodos la aplicación NodeJS pero en un nodo disinto a otro Redis".*
 
 ```yaml
 apiVersion: v1
@@ -91,15 +152,15 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
             - matchExpressions:
-              - key: node-role.kubernetes.io/master
+              - key: tier
                 operator: DoesNotExist
           preferredDuringSchedulingIgnoredDuringExecution:
             - weight: 1
               preference:
                 matchExpressions:
-                - key: tier
+                - key: nginx
+                  operator: Exists
 ```
-```node-role.kubernetes.io/master``` es un label que es agregado automáticamente a nodos  que hospedan la APIs de Kubernetes.
 
 
 ### podAffinity
@@ -108,67 +169,55 @@ Este tipo de afinidad permite agrupar pods en los nodos. Esto es util cuando que
 
 Por ejemplo, supongamos que:
 
-* Deseamos que los Pod **nginx** y **redis** esten desplegados juntos siempre que sea posible (preferred)
+* Deseamos que los Pod **example-js-affi** y **redis** esten desplegados juntos siempre que sea posible (preferred)
 * No queremos que dos Pod **redis** esten corriendos juntos en un mismo host (nodo).
-
-**Spec** de **nginx**:
-
-
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: nginx
-  role: web
-spec:
-  containers:
-    - name: app
-      image: nginx:latest
-      ports:
-        - containerPort: 80
-          protocol: TCP
-  affinity:
-    podAffinity:
-        preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 1
-            podAffinityTerm:
-              labelSelector:
-                matchExpressions:
-                - key: role
-                  operator: In
-                  values:
-                  - db
-              topologyKey: kubernetes.io/hostname
-        
-```
 
 **Spec** de **redis**:
 
 ```yaml
-apiVersion: v1
-kind: Pod
+apiVersion: apps/v1
+kind: Deployment
 metadata:
   name: redis
-  role: db
 spec:
-    containers:
-      - image: redis:latest
-        imagePullPolicy: Always
-        name: redis
-        ports:
-        - containerPort: 6379
-          protocol: TCP
-      restartPolicy: Always
-    affinity:
-      podAntiAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-        - labelSelector:
-            matchExpressions:
-            - key: role
-              operator: In
-              values:
-              - db
-          topologyKey: "kubernetes.io/hostname"
+  replicas: 3
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+        role: db
+    spec:
+      containers:
+        - image: redis:latest
+          imagePullPolicy: Always
+          name: redis
+          ports:
+          - containerPort: 6379
+            protocol: TCP
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: role
+                operator: In
+                values:
+                - db
+            topologyKey: "kubernetes.io/hostname"
+        podAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 1
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                  - key: role
+                    operator: In
+                    values:
+                    - example
+              topologyKey: kubernetes.io/hostname
 ```
 
 ### Taints and tolerations
@@ -178,7 +227,10 @@ spec:
 Asignamos la marca "designation=highperf" al nodo2. Los Pods que no soporten esa marcan no podran ser ejecutados en ese nodo.
 
 ```
-kubectl taint node node2 designation=highperf:NoExecute
+kubectl taint node node1 perf=alto:NoExecute
+kubectl taint node node2 perf=medio:NoExecute
+kubectl taint node node3 perf=bajo:NoExecute
+kubectl describe node node1
 ```
 
 Para permitir que un Pod se asigne a los nodos con esa marca la capacidad de soportar ese desfio en la definición del Spec.
@@ -188,7 +240,6 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: nginx
-  role: web
 spec:
   containers:
     - name: app
@@ -197,9 +248,9 @@ spec:
         - containerPort: 80
           protocol: TCP
   tolerations:
-    - key: "designation"
+    - key: "perf"
       operator: "Equal"
-      value: "highperf"
+      value: "medio"
       effect: "NoExecute"
 ```
 
@@ -207,5 +258,5 @@ El desafio debe hacer **match** completo a la marca.
 
 Para eliminar una **marca** ejecutamos:
 ```
-kubectl taint node node2 designation:NoExecute-
+kubectl taint node node2 perf:NoExecute-
 ```
