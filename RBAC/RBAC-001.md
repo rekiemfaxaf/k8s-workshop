@@ -13,12 +13,13 @@ Debido a lo anterior es que se utilizan ```servicesaccounts``` para crear cedenc
 
 Los ```service account``` se crean dentro de ```namespace```.
 
+
 ## Service Account
 
 | ServiceAccount | NameSpace | Recursos | Verbos |
 |----------------|-----------|------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------|
 | ops | all | all | all |
-| dev | default | deployments, statefulsets, services, pods, configmaps, secrets,,replicasets, ingresses, endpoints, cronjobs, jobs,persistentvolumeclaims | get, list , watch, update, patch, create |
+| dev | default | deployments, statefulsets, services, pods, pods/exec, configmaps, secrets,replicasets, ingresses, endpoints, cronjobs, jobs,persistentvolumeclaims | get, list , watch, update, patch, create |
 | audit | default | all | get, list, watch |
 
 ### Creación de service account

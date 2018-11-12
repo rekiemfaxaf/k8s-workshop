@@ -1,4 +1,4 @@
-## ConfigMap y Secret
+# ConfigMap y Secret
 
 
 **ConfigMap** y **Secret** son objetos estructuralmente iguales que se utilizan para almacenar información. 
@@ -7,7 +7,7 @@
 
 Ambos objetos pueden ser utilizados dentro del Pod como variable de entorno o archivo:
 
-### Como variabe de entorno
+## Como variabe de entorno
 
 El **Spec** de ConfigMap y Secret son muy parecidos y tienen la siguiente forma: 
 
@@ -57,7 +57,7 @@ spec:
               fieldPath: metadata.namespace
 ```
 
-### Como volumen
+## Como volumen
 
 ```yaml
 apiVersion: v1
