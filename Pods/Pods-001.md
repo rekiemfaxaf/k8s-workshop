@@ -29,17 +29,17 @@ En el caso de un Pod, y similar a la mayoria de los recursos en Kubernetes, el s
 apiVersion: v1
 kind: Pod
 metadata:
-  name: nginx
+  name: nodejs-example
   labels:
-    app: nginx
-    role: web
+    app: nodejs
+    role: example
     version: v1
 spec:
   containers:
     - name: app
-      image: nginx:latest
+      image: semoac/nodejs-example:latest
       ports:
-        - containerPort: 80
+        - containerPort: 3000
           protocol: TCP
 ```
 
@@ -56,21 +56,21 @@ kubectl get pod nginx
 
 Información detalla (troubleshooting):
 ```
-kubectl describe pods nginx
+kubectl describe pods nodejs-example
 ```
 
 Operar el pod en ejecución
 
 ```
-kubectl exec -ti nginx bash
-kubectl logs nginx
+kubectl exec -ti nodejs-example bash
+kubectl logs nodejs-example
 ```
 
 ## Port forwarding
 
 Permite redirirección puerto de un Pod a directamente en el laptop.
 ```
-kubectl port-forward nginx 8000:80
+kubectl port-forward nodejs-example 3000:3000
 ````
 
 ## TroubleShooting
@@ -78,6 +78,38 @@ kubectl port-forward nginx 8000:80
 Exportar el objeto Pod en formato **YAML** permite examinar el cambio **Status** en donde se detallan razones por las cuales podría fallar un despliegue: imágenes mal escritas, problemas de red, secretos no existentes, etc.
 
 ```
-kubectl get pod nginx -o yaml
-kubectl edit pod nginx
+kubectl get pod nodejs-example -o yaml
+kubectl edit pod nodejs-example
+```
+
+## Variables de entorno
+
+Las sección ```env``` del **spec** se utiliza para definir variables las pueden ser definidas
+en el mismo ```yaml``` o referenciando ```ConfigMaps```,```Secrets``` u otros
+[campos](https://kubernetes.io/docs/tasks/inject-data-application/environment-variable-expose-pod-information/) del yaml.
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nodejs-example
+  namespace: default
+  labels:
+    app: nodejs
+    role: example
+    version: v1
+spec:
+  containers:
+    - name: app
+      image: semoac/nodejs-example:latest
+      ports:
+        - containerPort: 3000
+          protocol: TCP
+      env:
+        - name: PORT
+          value: "3000"
+        - name: NS
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
 ```

@@ -1,0 +1,18 @@
+{
+  "name": "nodejs-example",
+  "version": "1.0.0",
+  "description": "Small app to learn K8S. Part of the K8S Workshop Linets.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "workshop",
+    "linets"
+  ],
+  "author": "Sergio A. Morales <smorales@linets.cl>",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.4"
+  }
+}

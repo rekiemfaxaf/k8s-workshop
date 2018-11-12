@@ -9,22 +9,46 @@ Es posible definir los recursos minimos y máximos de un Pod. Esta información 
 apiVersion: v1
 kind: Pod
 metadata:
-  name: nginx
-  role: web
+  name: nodejs-example-resources
+  namespace: default
+  labels:
+    app: nodejs
+    role: example
+    version: v1
 spec:
   containers:
     - name: app
-      image: nginx:latest
+      image: semoac/nodejs-example:latest
       ports:
-        - containerPort: 80
+        - containerPort: 3000
           protocol: TCP
-  resources:
-    requests:
-      memory: "128Mi"
-      cpu: "250m"
-    limits:
-      memory: "256Mi"
-      cpu: "500m"
+      env:
+        - name: PORT
+          value: "3000"
+        - name: NS
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: HEALTH_STATUS
+          value: "200"
+      livenessProbe:
+        tcpSocket:
+           port: 3000
+        initialDelaySeconds: 5
+        periodSeconds: 5
+      readinessProbe:
+        httpGet:
+          path: /health
+          port: 3000
+        initialDelaySeconds: 5
+        periodSeconds: 3
+      resources:
+        requests:
+          memory: "128Mi"
+          cpu: "250m"
+        limits:
+          memory: "256Mi"
+          cpu: "500m"
 ```
 
 **500m** corresponde a 500 milicpu, es decir, 1000m corresponde a 1 cpu completa.

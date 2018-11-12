@@ -11,24 +11,37 @@ Por cada contenedor en un Pod es posible definir **livenesProbe** y **readinessP
 apiVersion: v1
 kind: Pod
 metadata:
-  name: nginx
-  role: web
+  name: nodejs-example-probe
+  namespace: default
+  labels:
+    app: nodejs
+    role: example
+    version: v1
 spec:
   containers:
     - name: app
-      image: nginx:latest
+      image: semoac/nodejs-example:latest
       ports:
-        - containerPort: 80
+        - containerPort: 3000
           protocol: TCP
+      env:
+        - name: PORT
+          value: "3000"
+        - name: NS
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: HEALTH_STATUS
+          value: "500"
       livenessProbe:
         tcpSocket:
-           port: 80
+           port: 3000
         initialDelaySeconds: 5
         periodSeconds: 5
       readinessProbe:
         httpGet:
-          path: /
-          port: 8079
+          path: /health
+          port: 3000
         initialDelaySeconds: 5
         periodSeconds: 3
 ```

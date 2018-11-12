@@ -8,6 +8,10 @@
 
 ## Temas
 
-* [Todo sobre los pods](Pod-Menu.md)
-* [Alta disponiblidad de aplicaciones](Deploy-Menu.md)
-* [Configuraciones y secretos](Config/Config-001.md)
+* [Introducción a Pods](Pods/Pods-001.md)
+* [Probes y HealthChecks en Pods](Pods/Pods-002.md)
+* [Limitar recursos de Pods](Pods/Pods-003.md)
+* [Alta disponibilidad de Pods 1](Deploy/Replicasets-001.md)
+* [Alta disponibilidad de Pods 2](Deploy/Deployment-001.md)
+* [Multicontenedores e InitContainers](Pods/Pods-005.md)
+
