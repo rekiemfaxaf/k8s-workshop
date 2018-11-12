@@ -7,7 +7,7 @@
 
 Ambos objetos pueden ser utilizados dentro del Pod como variable de entorno o archivo:
 
-## Como variabe de entorno
+## Como variabe de entorno
 
 El **Spec** de ConfigMap y Secret son muy parecidos y tienen la siguiente forma: 
 
