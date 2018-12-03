@@ -51,7 +51,7 @@ kubectl:
 ```
 kubectl apply pod.spec.yaml
 kubectl po -o wide
-kubectl get pod nginx
+kubectl get pod nodejs-example
 ```
 
 Información detalla (troubleshooting):
