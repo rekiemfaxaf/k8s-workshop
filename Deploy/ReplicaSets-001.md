@@ -57,7 +57,7 @@ En este caso `spec.selector.matchLabels` indica la lista de label que **ReplicaS
 
 **ReplicaSet** se preocupará que existan creados **5** con el label `app:nodejs` a lo largo de todo el **namespace** independiente si el Pod fue creado por él o no.
 
-`spec.template.metadata.labels` estable con los labels con que se crearán los nuevos Pods. Esto debe coincider con el `selector` definido en `spec.selector`.
+`spec.template.metadata.labels` establece los labels con que se crearán los nuevos Pods. Esto debe coincider con el `selector` definido en `spec.selector`.
 
 Notar que al editar el ReplicaSet no se recrean los contenedores que ya estan en ejecución, lo que puede inducir inconsistencias.
 
