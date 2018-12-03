@@ -1,4 +1,4 @@
-# Developments
+# Deployments
 
 Este tipo de objeto agrega logicas robustas a *ReplicaSet* gestionando rollouts y rollbacks de despliegues,
 asegurando consistencia en el estado de los pods.
