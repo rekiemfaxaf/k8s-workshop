@@ -50,7 +50,7 @@ spec:
 kubectl:
 ```
 kubectl apply -f pod.spec.yaml
-kubectl po -o wide
+kubectl get po -o wide
 kubectl get pod nodejs-example
 ```
 
