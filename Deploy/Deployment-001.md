@@ -3,7 +3,8 @@
 Este tipo de objeto agrega logicas robustas a *ReplicaSet* gestionando rollouts y rollbacks de despliegues,
 asegurando consistencia en el estado de los pods.
 
-[INSERT IMAGE]
+
+![Deploymeny](dep-rs-pod-c.png)
 
 ```yaml
 apiVersion: apps/v1
