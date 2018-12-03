@@ -146,7 +146,7 @@ spec:
       image: nginx:latest
       ports:
         - containerPort: 80
-          protocol: 
+          protocol: TCP
   affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
