@@ -4,7 +4,7 @@ Los objetos ```Ìngress``` permiten exponer aplicaciones utilizando reglas de La
 
 Kubernetes no provee un controlador por omisión por lo que se debe instalar alguno.
 
-Entre los mas utilizados, y mantenidos oficialmente por Kubernetes, se encuentra ```Nginx Ingress Controller``` que puede ser facilemente instalado utilizando ```Helm````
+Entre los mas utilizados, y mantenidos oficialmente por Kubernetes, se encuentra ```Nginx Ingress Controller``` que puede ser facilemente instalado utilizando ```Helm```
 
 
 ```bash
