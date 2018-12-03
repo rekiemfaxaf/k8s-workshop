@@ -62,23 +62,23 @@ spec:
 
 Revisar estado del despliegue
 ```
-kubectl rollout status deployment/nginx
+kubectl rollout status deployment/nodejs-example
 ```
 
 Expandir/cotraer despligue
 ```
-kubectl scale deployment/nginx --replicas=12
-kubectl rollout status deployment/nginx
+kubectl scale deployment/nodejs-example --replicas=12
+kubectl rollout status deployment/nodejs-example
 ```
 
 Revisar historial de despliegues
 ```
-kubectl rollout history deploy/nginx
-kubectl rollout history deploy/nginx --revision=xx
+kubectl rollout history deploy/nodejs-example
+kubectl rollout history deploy/nodejs-example --revision=xx
 ```
 
 Rollback
 ```
-kubectl rollout history deploy/nginx
-kubectl rollout undo deploy/nginx --to-revision=3
+kubectl rollout history deploy/nodejs-example
+kubectl rollout undo deploy/nodejs-example --to-revision=3
 ```
