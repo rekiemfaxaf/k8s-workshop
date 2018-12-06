@@ -2,7 +2,7 @@
 
 **ReplicaSets** es un objeto básico de Kubernetes que permite dar **Hig Availavility** a **Pods**.
 
-[INSERT IMAGEN]
+![Deploymeny](dep-rs-pod-c.png)
 
 Su **spec** contiene un plantilla del *spec de un pod*.
 
